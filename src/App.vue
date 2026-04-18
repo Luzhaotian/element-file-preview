@@ -10,7 +10,7 @@
     </header>
 
     <section class="gallery-wrap" aria-label="示例媒体">
-      <file-media-preview :urls="mediaItems" />
+      <file-preview :urls="previewFiles" />
     </section>
 
     <p class="hint">点击任意缩略图即可打开预览，支持左右切换与关闭。</p>
@@ -18,9 +18,9 @@
 </template>
 
 <script>
-import { FileMediaPreview } from "../packages";
+import { FilePreview } from "../packages";
 
-const SAMPLE_MEDIA = [
+const SAMPLE_FILES = [
   {
     url: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
     type: "image/jpeg",
@@ -45,11 +45,11 @@ const SAMPLE_MEDIA = [
 export default {
   name: "App",
   components: {
-    FileMediaPreview,
+    FilePreview,
   },
   data() {
     return {
-      mediaItems: SAMPLE_MEDIA,
+      previewFiles: SAMPLE_FILES,
     };
   },
 };

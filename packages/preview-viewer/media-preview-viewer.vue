@@ -3,7 +3,7 @@
     <div
       ref="wrapper"
       tabindex="-1"
-      class="el-image-viewer__wrapper file-media-preview-viewer"
+      class="el-image-viewer__wrapper file-preview-viewer"
       :style="{ 'z-index': viewerZIndex }"
     >
       <div class="el-image-viewer__mask" @click.self="handleMaskClick"></div>
@@ -26,45 +26,26 @@
           <i class="el-icon-arrow-right" />
         </span>
       </template>
-      <div class="el-image-viewer__canvas media-preview-viewer__canvas">
-        <template v-if="currentItem">
-          <img
-            v-if="currentItem.mediaKind === 'image'"
-            :key="'img-' + currentItem.url"
-            class="el-image-viewer__img media-preview-viewer__img"
-            :src="currentItem.url"
-            alt=""
-            @click.stop
-            @error="onImgError"
-          />
-          <video
-            v-else-if="currentItem.mediaKind === 'video'"
-            :key="'v-' + currentItem.url"
-            ref="mediaEl"
-            class="media-preview-viewer__video"
-            :src="currentItem.url"
-            :poster="currentItem.poster || undefined"
-            controls
-            playsinline
-            preload="metadata"
-            @click.stop
-          />
-          <div
-            v-else-if="currentItem.mediaKind === 'audio'"
-            class="media-preview-viewer__audio"
-            @click.stop
-          >
-            <i class="el-icon-headset media-preview-viewer__audio-icon" />
-            <audio
-              :key="'a-' + currentItem.url"
-              ref="mediaEl"
-              class="media-preview-viewer__audio-el"
-              :src="currentItem.url"
-              controls
-              preload="metadata"
-            />
-          </div>
-        </template>
+      <div class="el-image-viewer__canvas file-preview-viewer__canvas">
+        <preview-image-pane
+          v-if="currentItem && currentItem.mediaKind === 'image'"
+          :key="'img-' + currentItem.url"
+          ref="mediaPane"
+          :url="currentItem.url"
+        />
+        <preview-video-pane
+          v-else-if="currentItem && currentItem.mediaKind === 'video'"
+          :key="'v-' + currentItem.url"
+          ref="mediaPane"
+          :url="currentItem.url"
+          :poster="currentItem.poster"
+        />
+        <preview-audio-pane
+          v-else-if="currentItem && currentItem.mediaKind === 'audio'"
+          :key="'a-' + currentItem.url"
+          ref="mediaPane"
+          :url="currentItem.url"
+        />
       </div>
     </div>
   </transition>
@@ -72,9 +53,17 @@
 
 <script>
 import { on, off } from "element-ui/src/utils/dom";
+import PreviewAudioPane from "../preview-panes/preview-audio-pane.vue";
+import PreviewImagePane from "../preview-panes/preview-image-pane.vue";
+import PreviewVideoPane from "../preview-panes/preview-video-pane.vue";
 
 export default {
   name: "MediaPreviewViewer",
+  components: {
+    PreviewImagePane,
+    PreviewVideoPane,
+    PreviewAudioPane,
+  },
   props: {
     /** @type {{ url: string, mediaKind: string, poster?: string }[]} */
     items: {
@@ -188,81 +177,40 @@ export default {
     },
     pauseMedia() {
       this.$nextTick(() => {
-        const el = this.$refs.mediaEl;
-        if (el && typeof el.pause === "function") {
-          try {
-            el.pause();
-          } catch {
-            /* ignore */
-          }
+        const pane = this.$refs.mediaPane;
+        if (pane && typeof pane.pause === "function") {
+          pane.pause();
         }
       });
-    },
-    onImgError(e) {
-      if (e.target) e.target.alt = "加载失败";
     },
   },
 };
 </script>
 
 <style scoped>
-.media-preview-viewer__canvas {
+.file-preview-viewer__canvas {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.media-preview-viewer__img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.media-preview-viewer__video {
-  max-width: 100%;
-  max-height: 100%;
-  outline: none;
-}
-
-.media-preview-viewer__audio {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 24px;
-  min-width: 280px;
-  max-width: 90vw;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 8px;
-}
-
-.media-preview-viewer__audio-icon {
-  font-size: 48px;
-  color: #fff;
-}
-
-.media-preview-viewer__audio-el {
-  width: 100%;
-  min-width: 260px;
 }
 </style>
 
 <style>
 /*
- * Element 默认未区分遮罩与画布的 z-index，在部分环境下遮罩会盖住画布导致点击图片误触 mask 关闭。
- * 仅作用于本组件根上的 .file-media-preview-viewer，不影响原生 el-image 预览。
+ * 遮罩在下、画布与按钮在上，避免误点内容触发关闭。
+ * 仅作用于 .file-preview-viewer，不影响原生 el-image 预览。
  */
-.file-media-preview-viewer .el-image-viewer__mask {
+.file-preview-viewer .el-image-viewer__mask {
   z-index: 0;
 }
 
-.file-media-preview-viewer .el-image-viewer__canvas {
+.file-preview-viewer .el-image-viewer__canvas {
   position: relative;
   z-index: 1;
   pointer-events: auto;
 }
 
-.file-media-preview-viewer .el-image-viewer__btn {
+.file-preview-viewer .el-image-viewer__btn {
   z-index: 2;
 }
 </style>

@@ -4,14 +4,15 @@
 
 ## 包结构（源码 `packages/`）
 
-| 目录              | 说明                                            |
-| ----------------- | ----------------------------------------------- |
-| `file-preview/`   | 入口组件 **`FileMediaPreview`**，拼装缩略与预览 |
-| `image/`          | 图片缩略（`el-image`）                          |
-| `video/`          | 视频缩略（`<video>`）                           |
-| `audio/`          | 音频缩略（占位块）                              |
-| `preview-viewer/` | 全屏预览层（`el-image-viewer` 同类名样式）      |
-| `shared/`         | 类型推断与 `urls` 归一化                        |
+| 目录              | 说明                                                       |
+| ----------------- | ---------------------------------------------------------- |
+| `file-preview/`   | 入口组件 **`FilePreview`**（文件预览），拼装缩略与全屏层   |
+| `image/`          | 图片缩略（`el-image`）                                     |
+| `video/`          | 视频缩略（`<video>`）                                      |
+| `audio/`          | 音频缩略（占位块）                                         |
+| `preview-panes/`  | **遮罩层中间**的预览块：图 / 视频 / 音频（便于扩展新类型） |
+| `preview-viewer/` | 全屏外壳（遮罩、关闭、左右切，`el-image-viewer` 同类样式） |
+| `shared/`         | 类型推断与 `urls` 归一化                                   |
 
 ## 环境要求
 
@@ -51,27 +52,27 @@ Vue.use(ElementUI);
 Vue.use(ElementFilePreview);
 ```
 
-全局会注册 **`FileMediaPreview`**，并保留别名 **`FileImagePreview`**（兼容旧代码，后续主版本可能移除）。
+全局会注册 **`FilePreview`**，并保留别名 **`FileMediaPreview`**、**`FileImagePreview`**（兼容旧代码，后续主版本可能移除）。
 
 ### 按需使用组件
 
 ```javascript
-import { FileMediaPreview } from "element-file-preview";
+import { FilePreview } from "element-file-preview";
 
 export default {
-  components: { FileMediaPreview },
+  components: { FilePreview },
 };
 ```
 
 ### 模板示例
 
 ```vue
-<FileMediaPreview :urls="mediaItems" :thumb-size="140" :gap="16" />
+<FilePreview :urls="previewFiles" :thumb-size="140" :gap="16" />
 ```
 
 ```javascript
-// 每项为 { url, type?, poster? }；建议始终传入 type
-const mediaItems = [
+// 每项为 { url, type?, poster? }；建议始终传入 type（后续可扩展更多文件类型）
+const previewFiles = [
   { url: "https://example.com/a.png", type: "image/png" },
   { url: "https://example.com/b.jpg" }, // 未传 type 时从 URL 推断
   {

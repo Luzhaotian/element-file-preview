@@ -1,6 +1,6 @@
 <template>
   <div
-    class="file-media-preview-gallery"
+    class="file-preview-gallery"
     :style="{
       gap: `${gap}px`,
     }"
@@ -8,7 +8,7 @@
     <div
       v-for="(entry, index) in mediaEntries"
       :key="entry.url + index"
-      class="file-media-preview-tile"
+      class="file-preview-tile"
       :style="thumbStyle"
       @click="openViewer(index)"
     >
@@ -42,7 +42,8 @@ import VideoPreviewThumb from "../video/video-thumb.vue";
 import { normalizePreviewItems } from "../shared/resolve-items";
 
 export default {
-  name: "FileMediaPreview",
+  /** 文件预览（图片 / 视频 / 音频，后续可扩展更多类型） */
+  name: "FilePreview",
   components: {
     ImagePreviewThumb,
     VideoPreviewThumb,
@@ -122,13 +123,13 @@ export default {
 </script>
 
 <style scoped>
-.file-media-preview-gallery {
+.file-preview-gallery {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-.file-media-preview-tile {
+.file-preview-tile {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);

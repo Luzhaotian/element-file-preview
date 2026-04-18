@@ -122,7 +122,7 @@ export function normalizePreviewItems(items) {
 
     if (!supported && process.env.NODE_ENV !== "production") {
       console.warn(
-        "[FileMediaPreview] 类型无法识别或当前不支持预览，请为该条传入明确的 type（如 image/png、video/mp4、audio/mpeg）。",
+        "[FilePreview] 类型无法识别或当前不支持预览，请为该条传入明确的 type（如 image/png、video/mp4、audio/mpeg）。",
         { index, url, type, typeSource }
       );
     }

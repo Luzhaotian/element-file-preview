@@ -6,14 +6,14 @@
 
 ### 变更（破坏性）
 
-- 主组件更名为 **`FileMediaPreview`**（仍可通过 **`FileImagePreview`** 别名按需引入或全局注册，后续主版本可能移除别名）。
+- 主组件更名为 **`FilePreview`**（文件预览，便于后续扩展非媒体文件）；仍可通过 **`FileMediaPreview`**、**`FileImagePreview`** 别名引入或全局注册。
 - `urls` 为 **`{ url, type?, poster? }` 对象数组**；`type` 可选，缺省时从 URL 推断，无法识别或不支持预览时在开发环境 `console.warn`，且该条不展示。
 
 ### 新增
 
-- 支持 **视频、音频** 预览：全屏层沿用 `el-image-viewer` 遮罩与按钮样式，画布内为 `<video controls>` / `<audio controls>`；视频缩略可选 **`poster`**。
-- 源码按职责拆包：`packages/image`、`packages/video`、`packages/audio`、`packages/preview-viewer`、`packages/shared`、`packages/file-preview`。
-- 修复自定义预览层 **遮罩盖住内容** 导致的误触关闭：为本组件根增加 `file-media-preview-viewer` 并调整遮罩 / 画布 / 按钮 **z-index**。
+- 支持 **视频、音频** 预览：全屏层沿用 `el-image-viewer` 遮罩与按钮样式；视频缩略可选 **`poster`**。
+- 源码按职责拆包：`packages/image`、`packages/video`、`packages/audio`、`packages/preview-panes`（**遮罩内预览块**）、`packages/preview-viewer`、`packages/shared`、`packages/file-preview`。
+- 修复自定义预览层 **遮罩盖住内容** 导致的误触关闭：预览根类名 **`file-preview-viewer`**，并调整遮罩 / 画布 / 按钮 **z-index**。
 
 <!-- 下一次发布前，把此处条目移到新版本标题下 -->
 

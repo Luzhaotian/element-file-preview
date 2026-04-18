@@ -27,7 +27,9 @@ const SAMPLE_IMAGES = [
 
 export default {
   name: "App",
-  components: { FileImagePreview },
+  components: {
+    FileImagePreview,
+  },
   data() {
     return {
       imageUrls: SAMPLE_IMAGES,

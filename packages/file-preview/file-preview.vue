@@ -35,10 +35,10 @@
 </template>
 
 <script>
-import AudioPreviewThumb from "../audio/audio-thumb.vue";
-import ImagePreviewThumb from "../image/image-thumb.vue";
+import AudioPreviewThumb from "../media/audio-thumb.vue";
+import ImagePreviewThumb from "../media/image-thumb.vue";
 import MediaPreviewViewer from "../preview-viewer/media-preview-viewer.vue";
-import VideoPreviewThumb from "../video/video-thumb.vue";
+import VideoPreviewThumb from "../media/video-thumb.vue";
 import { normalizePreviewItems } from "../shared/resolve-items";
 
 /** 文件预览（图片 / 视频 / 音频等，可继续扩展类型） */

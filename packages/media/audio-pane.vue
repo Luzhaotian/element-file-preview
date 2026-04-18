@@ -1,9 +1,9 @@
 <template>
-  <div class="viewer-content__audio" @click.stop>
-    <i class="el-icon-headset viewer-content__audio-icon" />
+  <div class="media-pane__audio" @click.stop>
+    <i class="el-icon-headset media-pane__audio-icon" />
     <audio
       ref="media"
-      class="viewer-content__audio-el"
+      class="media-pane__audio-el"
       :src="url"
       controls
       preload="metadata"
@@ -36,7 +36,7 @@ export default {
 </script>
 
 <style scoped>
-.viewer-content__audio {
+.media-pane__audio {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,12 +48,12 @@ export default {
   border-radius: 8px;
 }
 
-.viewer-content__audio-icon {
+.media-pane__audio-icon {
   font-size: 48px;
   color: #fff;
 }
 
-.viewer-content__audio-el {
+.media-pane__audio-el {
   width: 100%;
   min-width: 260px;
 }

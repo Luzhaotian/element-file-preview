@@ -1,6 +1,6 @@
 <template>
   <img
-    class="el-image-viewer__img viewer-content__img"
+    class="el-image-viewer__img media-pane__img"
     :src="url"
     alt=""
     @click.stop
@@ -29,7 +29,7 @@ export default {
 </script>
 
 <style scoped>
-.viewer-content__img {
+.media-pane__img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;

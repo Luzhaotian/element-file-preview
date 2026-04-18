@@ -55,9 +55,9 @@
 
 <script>
 import { on, off } from "element-ui/src/utils/dom";
-import ViewerAudioPane from "../viewer-content/audio-pane.vue";
-import ViewerImagePane from "../viewer-content/image-pane.vue";
-import ViewerVideoPane from "../viewer-content/video-pane.vue";
+import ViewerAudioPane from "../media/audio-pane.vue";
+import ViewerImagePane from "../media/image-pane.vue";
+import ViewerVideoPane from "../media/video-pane.vue";
 
 export default {
   name: "MediaPreviewViewer",

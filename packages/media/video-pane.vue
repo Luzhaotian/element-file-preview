@@ -1,7 +1,7 @@
 <template>
   <video
     ref="media"
-    class="viewer-content__video"
+    class="media-pane__video"
     :src="url"
     :poster="poster || undefined"
     controls
@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style scoped>
-.viewer-content__video {
+.media-pane__video {
   max-width: 100%;
   max-height: 100%;
   outline: none;

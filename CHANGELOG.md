@@ -12,7 +12,7 @@
 ### 新增
 
 - 支持 **视频、音频** 预览：全屏层沿用 `el-image-viewer` 遮罩与按钮样式，画布内为 `<video controls>` / `<audio controls>`；视频缩略可选 **`poster`**。
-- 源码按职责拆包：`packages/image`、`packages/video`、`packages/audio`、`packages/viewer-content`、`packages/preview-viewer`、`packages/shared`、`packages/file-preview`。
+- 源码按职责拆包：图片 / 视频 / 音频的**缩略 + 遮罩内预览**统一放在 **`packages/media/`**（`image-thumb.vue`、`video-thumb.vue`、`audio-thumb.vue`、`image-pane.vue`、`video-pane.vue`、`audio-pane.vue`），另有 `packages/preview-viewer`、`packages/shared`、`packages/file-preview`。
 - 修复自定义预览层 **遮罩盖住内容** 导致的误触关闭：预览根类名 **`file-preview-viewer`**，并调整遮罩 / 画布 / 按钮 **z-index**。
 
 <!-- 下一次发布前，把此处条目移到新版本标题下 -->

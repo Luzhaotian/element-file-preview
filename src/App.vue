@@ -10,7 +10,7 @@
     </header>
 
     <section class="gallery-wrap" aria-label="示例媒体">
-      <file-preview :urls="previewFiles" />
+      <file-preview :urls="fileItems" />
     </section>
 
     <p class="hint">点击任意缩略图即可打开预览，支持左右切换与关闭。</p>
@@ -49,7 +49,7 @@ export default {
   },
   data() {
     return {
-      previewFiles: SAMPLE_FILES,
+      fileItems: SAMPLE_FILES,
     };
   },
 };

@@ -26,26 +26,28 @@
           <i class="el-icon-arrow-right" />
         </span>
       </template>
-      <div class="el-image-viewer__canvas file-preview-viewer__canvas">
-        <preview-image-pane
-          v-if="currentItem && currentItem.mediaKind === 'image'"
-          :key="'img-' + currentItem.url"
-          ref="mediaPane"
-          :url="currentItem.url"
-        />
-        <preview-video-pane
-          v-else-if="currentItem && currentItem.mediaKind === 'video'"
-          :key="'v-' + currentItem.url"
-          ref="mediaPane"
-          :url="currentItem.url"
-          :poster="currentItem.poster"
-        />
-        <preview-audio-pane
-          v-else-if="currentItem && currentItem.mediaKind === 'audio'"
-          :key="'a-' + currentItem.url"
-          ref="mediaPane"
-          :url="currentItem.url"
-        />
+      <div class="el-image-viewer__canvas media-preview-viewer__canvas">
+        <template v-if="currentItem">
+          <viewer-image-pane
+            v-if="currentItem.mediaKind === 'image'"
+            :key="'img-' + currentItem.url"
+            ref="activePane"
+            :url="currentItem.url"
+          />
+          <viewer-video-pane
+            v-else-if="currentItem.mediaKind === 'video'"
+            :key="'v-' + currentItem.url"
+            ref="activePane"
+            :url="currentItem.url"
+            :poster="currentItem.poster"
+          />
+          <viewer-audio-pane
+            v-else-if="currentItem.mediaKind === 'audio'"
+            :key="'a-' + currentItem.url"
+            ref="activePane"
+            :url="currentItem.url"
+          />
+        </template>
       </div>
     </div>
   </transition>
@@ -53,16 +55,16 @@
 
 <script>
 import { on, off } from "element-ui/src/utils/dom";
-import PreviewAudioPane from "../preview-panes/preview-audio-pane.vue";
-import PreviewImagePane from "../preview-panes/preview-image-pane.vue";
-import PreviewVideoPane from "../preview-panes/preview-video-pane.vue";
+import ViewerAudioPane from "../viewer-content/audio-pane.vue";
+import ViewerImagePane from "../viewer-content/image-pane.vue";
+import ViewerVideoPane from "../viewer-content/video-pane.vue";
 
 export default {
   name: "MediaPreviewViewer",
   components: {
-    PreviewImagePane,
-    PreviewVideoPane,
-    PreviewAudioPane,
+    ViewerImagePane,
+    ViewerVideoPane,
+    ViewerAudioPane,
   },
   props: {
     /** @type {{ url: string, mediaKind: string, poster?: string }[]} */
@@ -177,7 +179,7 @@ export default {
     },
     pauseMedia() {
       this.$nextTick(() => {
-        const pane = this.$refs.mediaPane;
+        const pane = this.$refs.activePane;
         if (pane && typeof pane.pause === "function") {
           pane.pause();
         }
@@ -188,7 +190,7 @@ export default {
 </script>
 
 <style scoped>
-.file-preview-viewer__canvas {
+.media-preview-viewer__canvas {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,8 +199,7 @@ export default {
 
 <style>
 /*
- * 遮罩在下、画布与按钮在上，避免误点内容触发关闭。
- * 仅作用于 .file-preview-viewer，不影响原生 el-image 预览。
+ * 遮罩与画布、按钮的层叠顺序；仅作用于 .file-preview-viewer。
  */
 .file-preview-viewer .el-image-viewer__mask {
   z-index: 0;

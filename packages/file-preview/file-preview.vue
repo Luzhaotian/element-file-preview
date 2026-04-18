@@ -41,8 +41,8 @@ import MediaPreviewViewer from "../preview-viewer/media-preview-viewer.vue";
 import VideoPreviewThumb from "../video/video-thumb.vue";
 import { normalizePreviewItems } from "../shared/resolve-items";
 
+/** 文件预览（图片 / 视频 / 音频等，可继续扩展类型） */
 export default {
-  /** 文件预览（图片 / 视频 / 音频，后续可扩展更多类型） */
   name: "FilePreview",
   components: {
     ImagePreviewThumb,

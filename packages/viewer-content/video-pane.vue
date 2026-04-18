@@ -1,7 +1,7 @@
 <template>
   <video
     ref="media"
-    class="file-preview-pane__video"
+    class="viewer-content__video"
     :src="url"
     :poster="poster || undefined"
     controls
@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "PreviewVideoPane",
+  name: "ViewerVideoPane",
   props: {
     url: {
       type: String,
@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style scoped>
-.file-preview-pane__video {
+.viewer-content__video {
   max-width: 100%;
   max-height: 100%;
   outline: none;

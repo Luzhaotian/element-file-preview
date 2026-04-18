@@ -1,9 +1,9 @@
 <template>
-  <div class="file-preview-pane__audio" @click.stop>
-    <i class="el-icon-headset file-preview-pane__audio-icon" />
+  <div class="viewer-content__audio" @click.stop>
+    <i class="el-icon-headset viewer-content__audio-icon" />
     <audio
       ref="media"
-      class="file-preview-pane__audio-el"
+      class="viewer-content__audio-el"
       :src="url"
       controls
       preload="metadata"
@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "PreviewAudioPane",
+  name: "ViewerAudioPane",
   props: {
     url: {
       type: String,
@@ -36,7 +36,7 @@ export default {
 </script>
 
 <style scoped>
-.file-preview-pane__audio {
+.viewer-content__audio {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,12 +48,12 @@ export default {
   border-radius: 8px;
 }
 
-.file-preview-pane__audio-icon {
+.viewer-content__audio-icon {
   font-size: 48px;
   color: #fff;
 }
 
-.file-preview-pane__audio-el {
+.viewer-content__audio-el {
   width: 100%;
   min-width: 260px;
 }

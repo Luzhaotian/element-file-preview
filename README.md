@@ -1,35 +1,22 @@
 # element-file-preview
 
-面向老项目的渐进式文件预览能力：**Vue 2** + **Element UI**，支持图片 / 视频 / 音频缩略与全屏预览（遮罩样式与 `el-image-viewer` 一致）。
+基于 **Vue 2** 与 **Element UI** 的文件预览小库：缩略图网格 + 全屏层，样式与 `el-image-viewer` 的遮罩与按钮一致。图片、视频、音频排在同一列表中时，**左右切换会按顺序经过全部条目**。
 
-## 包结构（源码 `packages/`）
+## 特性
 
-```
-packages/
-├── index.js                      # 对外入口（export / install）
-├── components/FilePreview.vue      # 文件预览主组件
-├── components/FilePreviewThumb.vue # 单格缩略（按 mediaKind 分支展示）
-├── viewer/MediaPreviewViewer.vue   # 全屏预览（图 / 音视频统一壳，左右切换含全部条目）
-├── type-handlers/
-│   ├── thumbs/                     # 视频 / 音频缩略子组件（由 FilePreviewThumb 组合）
-│   └── panes/                      # 全屏内画布（图 / 视频 / 音频）
-└── utils/resolve-items.js          # type 推断与 urls 归一化
-```
-
-| 目录                    | 说明                                       |
-| ----------------------- | ------------------------------------------ |
-| `components/`           | **`FilePreview`**、**`FilePreviewThumb`**   |
-| `viewer/`               | **`MediaPreviewViewer`**（关闭、左右切换整列表；图片含缩放旋转工具条） |
-| `type-handlers/thumbs/` | 视频 / 音频缩略（与 `FilePreviewThumb` 内图片并列使用） |
-| `type-handlers/panes/`  | 全屏内图片 / 视频 / 音频子组件            |
-| `utils/`                | 纯逻辑                                     |
-
-目录名 **`type-handlers`** 表示按文件类型分发的缩略与遮罩内预览实现；也可选用如 **`preview-engines`**、**`file-renderers`** 等命名。
+- **缩略图**：`FilePreview` 内置 `FilePreviewThumb`，按类型展示图 / 视频 / 音频格。
+- **全屏**：单一 `MediaPreviewViewer` 壳层；图片带与 Element 相近的缩放、旋转、适应/原始尺寸、拖拽与滚轮；视频 / 音频为内嵌控件。
+- **数据**：传入 `urls` 后由 `normalizePreviewItems` 推断 `type` 与 `mediaKind`；不支持的项在开发环境 `console.warn` 并跳过。
+- **发布**：UMD / CommonJS 产物在 `dist/`，入口见 `package.json` 的 `main` 与 `files`。
 
 ## 环境要求
 
-- Vue `^2.6`
-- Element UI `^2.15`（需在项目中引入 `theme-chalk`，包含 Image / ImageViewer 相关样式）
+| 依赖       | 版本    |
+| ---------- | ------- |
+| Vue        | `^2.6`  |
+| Element UI | `^2.15` |
+
+业务项目需引入 **`element-ui/lib/theme-chalk/index.css`**（含 `image` / `image-viewer` 相关样式），否则全屏层按钮与工具条可能无样式。
 
 ## 安装
 
@@ -37,20 +24,9 @@ packages/
 npm install element-file-preview
 ```
 
-若从源码使用，可 `npm link` 或相对路径引用构建产物。
+`element-ui` 与 `vue` 为 **peerDependencies**，请自行安装。
 
-## 构建库产物
-
-发布或使用 UMD/CommonJS 前在仓库根目录执行：
-
-```bash
-npm install
-npm run lib
-```
-
-产物输出在 `dist/` 目录（与 `package.json` 中 `main`、`files` 字段一致）。
-
-## 使用
+## 快速使用
 
 ### 全局注册
 
@@ -64,9 +40,9 @@ Vue.use(ElementUI);
 Vue.use(ElementFilePreview);
 ```
 
-全局会注册 **`FilePreview`**（文件预览）、**`FilePreviewThumb`**（单格缩略），并保留别名 **`FileMediaPreview`**、**`FileImagePreview`**（兼容旧代码，后续主版本可能移除）。
+会注册 **`FilePreview`**、**`FilePreviewThumb`**。为兼容旧代码，同时注册别名 **`FileMediaPreview`**、**`FileImagePreview`**（均指向 `FilePreview`，后续主版本可能移除）。
 
-### 按需使用组件
+### 按需引入
 
 ```javascript
 import { FilePreview, FilePreviewThumb } from "element-file-preview";
@@ -76,47 +52,117 @@ export default {
 };
 ```
 
-### 模板示例
+### 最小示例
 
 ```vue
-<FilePreview :urls="fileItems" :thumb-size="140" :gap="16" />
-```
+<template>
+  <file-preview
+    :urls="fileItems"
+    :thumb-size="140"
+    :gap="16"
+    :viewer-z-index="2000"
+    :mask-closable="true"
+  />
+</template>
 
-```javascript
-// 每项为 { url, type?, poster?, resetOnClose? }；建议始终传入 type（后续可扩展更多文件类型）
-const fileItems = [
-  { url: "https://example.com/a.png", type: "image/png" },
-  { url: "https://example.com/b.jpg" }, // 未传 type 时从 URL 推断
-  {
-    url: "https://example.com/c.mp4",
-    type: "video/mp4",
-    poster: "https://example.com/c-poster.jpg",
-    // resetOnClose 缺省为 true：关闭全屏后回到开头；设为 false 保留进度
+<script>
+import { FilePreview } from "element-file-preview";
+
+export default {
+  components: { FilePreview },
+  data() {
+    return {
+      fileItems: [
+        { url: "https://example.com/a.png", type: "image/png" },
+        { url: "https://example.com/b.jpg" },
+        {
+          url: "https://example.com/c.mp4",
+          type: "video/mp4",
+          poster: "https://example.com/c-poster.jpg",
+        },
+        {
+          url: "https://example.com/d.mp3",
+          type: "audio/mpeg",
+          resetOnClose: false,
+        },
+      ],
+    };
   },
-  { url: "https://example.com/d.mp3", type: "audio/mpeg", resetOnClose: false },
-];
+};
+</script>
 ```
 
-- `urls`（必填）：对象数组，每项含 **`url`**、可选 **`type`**（`image/*`、`video/*`、`audio/*` 或对应扩展名）、可选 **`poster`**（视频缩略 / 封面图 URL，仅视频有效）、可选 **`resetOnClose`**（**视频 / 音频**，默认 **`true`**：关闭全屏预览时暂停并 `currentTime = 0`；为 **`false`** 时保留播放进度）。缺省 `type` 时从 URL 推断；**未知或不支持**时在开发环境 `console.warn`，该条不参与预览。
-- 全屏预览为**单一** `MediaPreviewViewer`：样式类名与 **`el-image-viewer`** 对齐（遮罩、关闭、左右切换）；**左右切换按 `urls` 解析后的顺序遍历全部图片与音视频**。图片支持与 Element 一致的缩放、旋转、适应/原始尺寸及滚轮与快捷键；视频 / 音频为内嵌控件。
-- `thumb-size`：缩略图边长（px），默认 `140`
-- `gap`：缩略图间距（px），默认 `16`
-- `viewer-z-index`：预览层 z-index，默认 `2000`（与 el-image 一致）
-- `mask-closable`：是否**点击遮罩**关闭全屏预览，默认 **`true`**；设为 `false` 时仅能通过关闭按钮等方式退出（与 Element `el-image-viewer` 的 `maskClosable` 行为一致）
+## `FilePreview` 属性
 
-## 本地演示
+| 属性           | 类型      | 默认值   | 说明                                                                                  |
+| -------------- | --------- | -------- | ------------------------------------------------------------------------------------- |
+| `urls`         | `Array`   | （必填） | 见下文「每一项形状」                                                                  |
+| `thumbSize`    | `Number`  | `140`    | 缩略格边长（px）                                                                      |
+| `gap`          | `Number`  | `16`     | 缩略格间距（px）                                                                      |
+| `viewerZIndex` | `Number`  | `2000`   | 全屏层 z-index                                                                        |
+| `maskClosable` | `Boolean` | `true`   | 点击遮罩是否关闭全屏（建议写 `:mask-closable="false"`，勿写无绑定的字符串 `"false"`） |
+
+## `urls` 每一项
+
+对象字段：
+
+| 字段           | 必填 | 说明                                                                                    |
+| -------------- | ---- | --------------------------------------------------------------------------------------- |
+| `url`          | 是   | 资源地址                                                                                |
+| `type`         | 否   | MIME 或扩展语义（如 `image/png`、`video/mp4`）；缺省时从 URL 推断                       |
+| `poster`       | 否   | 视频封面 / 预览图 URL                                                                   |
+| `resetOnClose` | 否   | 仅 **视频 / 音频**；默认 `true`：关闭全屏时暂停并 `currentTime = 0`；`false` 时保留进度 |
+
+解析后条目含 `mediaKind`（`image` | `video` | `audio`）等，供内部与 `FilePreviewThumb` 使用。
+
+## 全屏预览行为
+
+- 使用 **`MediaPreviewViewer`**（本包内部组件，默认不从 `index` 导出）。
+- **顺序**：与过滤后的 `mediaEntries` 顺序一致，上一张 / 下一张在**全部**图片与音视频之间循环（多于一条时显示左右箭头）。
+- **图片**：底部工具条与快捷键行为对齐 Element `image-viewer` 习惯（含空格切换显示模式、方向键缩放等）。
+- **键盘**：`Esc` 关闭；`←` `→` 切换条目（在图片模式下与 Element 一致）。
+
+## `FilePreviewThumb`
+
+单格缩略，适合自建列表时复用。
+
+| 属性   | 类型     | 说明                                                                           |
+| ------ | -------- | ------------------------------------------------------------------------------ |
+| `item` | `Object` | 需含 `url`、`mediaKind`；可选 `poster` 等，与 `normalizePreviewItems` 输出一致 |
+
+事件：**`activate`**，载荷为当前 `item`（点击或 Enter / Space）。
+
+使用前需自行保证 `item` 已归一化，或从 `FilePreview` 同源数据传入。
+
+## 源码目录 `packages/`
+
+```
+packages/
+├── index.js                         # install、具名导出
+├── components/
+│   ├── FilePreview.vue
+│   └── FilePreviewThumb.vue
+├── viewer/
+│   └── MediaPreviewViewer.vue       # 全屏壳 + 图片工具条 + 音视频画布
+├── type-handlers/
+│   ├── thumbs/                      # 视频 / 音频缩略
+│   └── panes/                       # 全屏内 图 / 视频 / 音频
+└── utils/
+    └── resolve-items.js             # 类型推断与归一化
+```
+
+## 构建与本地演示
 
 ```bash
-npm run serve
+npm install
+npm run lib      # 输出 dist/
+npm run serve    # 演示应用
 ```
 
-## 仓库
+## 链接
 
-- <https://github.com/Luzhaotian/element-file-preview>
-
-## 更新日志
-
-版本变更请查看 [CHANGELOG.md](./CHANGELOG.md)。
+- 仓库：<https://github.com/Luzhaotian/element-file-preview>
+- 更新日志：[CHANGELOG.md](./CHANGELOG.md)
 
 ## 许可证
 

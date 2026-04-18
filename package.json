@@ -2,7 +2,7 @@
   "name": "element-file-preview",
   "version": "0.1.0",
   "private": false,
-  "description": "文件预览 — 面向老项目的渐进式预览能力；第一步：Element UI el-image 图片预览",
+  "description": "文件预览 — Vue 2 + Element UI：图片 / 视频 / 音频缩略与全屏预览（el-image-viewer 样式遮罩）",
   "main": "dist/element-file-preview.umd.js",
   "files": [
     "dist"

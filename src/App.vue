@@ -48,7 +48,8 @@ body,
   box-sizing: border-box;
   min-height: 100vh;
   padding: 40px 24px 48px;
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+  font-family:
+    "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", Arial, sans-serif;
   color: #303133;
   background: #f5f7fa;

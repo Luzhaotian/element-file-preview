@@ -56,9 +56,9 @@ export default {
 <FileImagePreview :urls="imageUrls" :thumb-size="140" :gap="16" />
 ```
 
-- `urls`（必填）：图片地址数组  
-- `thumb-size`：缩略图边长（px），默认 `140`  
-- `gap`：缩略图间距（px），默认 `16`  
+- `urls`（必填）：图片地址数组
+- `thumb-size`：缩略图边长（px），默认 `140`
+- `gap`：缩略图间距（px），默认 `16`
 
 ## 本地演示
 

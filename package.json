@@ -1,0 +1,76 @@
+{
+  "name": "element-file-preview",
+  "version": "0.1.0",
+  "private": false,
+  "description": "文件预览 — 面向老项目的渐进式预览能力；第一步：Element UI el-image 图片预览",
+  "main": "dist/element-file-preview.umd.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Luzhaotian/element-file-preview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Luzhaotian/element-file-preview/issues"
+  },
+  "homepage": "https://github.com/Luzhaotian/element-file-preview#readme",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "element",
+    "file",
+    "preview",
+    "image",
+    "vue2"
+  ],
+  "peerDependencies": {
+    "element-ui": "^2.15.0",
+    "vue": "^2.6.0"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "lib": "vue-cli-service build --target lib --name element-file-preview packages/index.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "core-js": "^3.8.3",
+    "element-ui": "^2.15.14",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "vue": "^2.6.14",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "eslintIgnore": [
+    "dist",
+    "node_modules"
+  ],
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser",
+      "requireConfigFile": false
+    },
+    "rules": {}
+  }
+}

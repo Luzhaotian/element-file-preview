@@ -10,18 +10,8 @@
       :key="entry.url + index"
       class="file-preview-tile"
       :style="thumbStyle"
-      @click="openViewer(index)"
     >
-      <image-preview-thumb
-        v-if="entry.mediaKind === 'image'"
-        :url="entry.url"
-      />
-      <video-preview-thumb
-        v-else-if="entry.mediaKind === 'video'"
-        :url="entry.url"
-        :poster="entry.poster"
-      />
-      <audio-preview-thumb v-else-if="entry.mediaKind === 'audio'" />
+      <file-preview-thumb :item="entry" @activate="onThumbActivate" />
     </div>
 
     <media-preview-viewer
@@ -29,29 +19,26 @@
       :items="mediaEntries"
       :initial-index="viewerIndex"
       :z-index="viewerZIndex"
+      :mask-closable="maskClosableEffective"
       @close="closeViewer"
     />
   </div>
 </template>
 
 <script>
-import AudioPreviewThumb from "../media/audio-thumb.vue";
-import ImagePreviewThumb from "../media/image-thumb.vue";
-import MediaPreviewViewer from "../preview-viewer/media-preview-viewer.vue";
-import VideoPreviewThumb from "../media/video-thumb.vue";
-import { normalizePreviewItems } from "../shared/resolve-items";
+import FilePreviewThumb from "./FilePreviewThumb.vue";
+import MediaPreviewViewer from "../viewer/MediaPreviewViewer.vue";
+import { normalizePreviewItems } from "../utils/resolve-items";
 
 /** 文件预览（图片 / 视频 / 音频等，可继续扩展类型） */
 export default {
   name: "FilePreview",
   components: {
-    ImagePreviewThumb,
-    VideoPreviewThumb,
-    AudioPreviewThumb,
+    FilePreviewThumb,
     MediaPreviewViewer,
   },
   props: {
-    /** 每项为 { url, type?, poster? }；type 缺省时从 URL 推断 */
+    /** 每项为 { url, type?, poster?, resetOnClose? }；type 缺省时从 URL 推断 */
     urls: {
       type: Array,
       required: true,
@@ -63,7 +50,8 @@ export default {
               item &&
               typeof item === "object" &&
               typeof item.url === "string" &&
-              (item.poster == null || typeof item.poster === "string")
+              (item.poster == null || typeof item.poster === "string") &&
+              (item.resetOnClose == null || typeof item.resetOnClose === "boolean")
           )
         );
       },
@@ -79,6 +67,11 @@ export default {
     viewerZIndex: {
       type: Number,
       default: 2000,
+    },
+    /** 点击遮罩是否关闭全屏 */
+    maskClosable: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -97,6 +90,12 @@ export default {
     mediaEntries() {
       return this.resolvedItems.filter((e) => e.supported && e.mediaKind);
     },
+    maskClosableEffective() {
+      const v = this.maskClosable;
+      if (v === false || v === 0) return false;
+      if (typeof v === "string" && v.toLowerCase() === "false") return false;
+      return true;
+    },
   },
   watch: {
     urls: {
@@ -108,7 +107,15 @@ export default {
     },
   },
   methods: {
+    onThumbActivate(entry) {
+      const i = this.mediaEntries.findIndex(
+        (e) => e.url === entry.url && e.mediaKind === entry.mediaKind
+      );
+      if (i < 0) return;
+      this.openViewer(i);
+    },
     openViewer(index) {
+      if (index < 0 || index >= this.mediaEntries.length) return;
       this.viewerIndex = index;
       this.prevBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
@@ -133,7 +140,6 @@ export default {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
   background: #fff;
   flex-shrink: 0;
 }

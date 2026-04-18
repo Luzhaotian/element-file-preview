@@ -97,8 +97,8 @@ export function mediaKindFromType(type) {
 }
 
 /**
- * @param {Array<{ url: string, type?: string, poster?: string }>} items
- * @returns {Array<{ url: string, type: string, mediaKind: 'image'|'video'|'audio'|null, poster: string, supported: boolean, typeSource: 'explicit' | 'inferred' }>}
+ * @param {Array<{ url: string, type?: string, poster?: string, resetOnClose?: boolean }>} items
+ * @returns {Array<{ url: string, type: string, mediaKind: 'image'|'video'|'audio'|null, poster: string, resetOnClose: boolean, supported: boolean, typeSource: 'explicit' | 'inferred' }>}
  */
 export function normalizePreviewItems(items) {
   if (!Array.isArray(items)) return [];
@@ -109,6 +109,7 @@ export function normalizePreviewItems(items) {
       raw && raw.poster != null && typeof raw.poster === "string"
         ? raw.poster
         : "";
+    const resetOnClose = !(raw && raw.resetOnClose === false);
     let type = raw && raw.type != null ? String(raw.type).trim() : "";
     let typeSource = "explicit";
 
@@ -132,6 +133,7 @@ export function normalizePreviewItems(items) {
       type,
       mediaKind: supported ? mediaKind : null,
       poster,
+      resetOnClose,
       supported,
       typeSource,
     };

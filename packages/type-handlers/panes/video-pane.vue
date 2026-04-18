@@ -35,6 +35,17 @@ export default {
         }
       }
     },
+    /** 关闭预览时：暂停并回到开头（由 viewer 在 resetOnClose 为 true 时调用） */
+    resetPlayback() {
+      const el = this.$refs.media;
+      if (!el) return;
+      try {
+        el.pause();
+        el.currentTime = 0;
+      } catch {
+        /* ignore */
+      }
+    },
   },
 };
 </script>

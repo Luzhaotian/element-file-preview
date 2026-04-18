@@ -31,6 +31,16 @@ export default {
         }
       }
     },
+    resetPlayback() {
+      const el = this.$refs.media;
+      if (!el) return;
+      try {
+        el.pause();
+        el.currentTime = 0;
+      } catch {
+        /* ignore */
+      }
+    },
   },
 };
 </script>

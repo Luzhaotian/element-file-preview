@@ -3,7 +3,10 @@
     class="el-image-viewer__img media-pane__img"
     :src="url"
     alt=""
+    :style="imgStyle"
     @click.stop
+    @mousedown="$emit('image-mousedown', $event)"
+    @load="$emit('image-load')"
     @error="onError"
   />
 </template>
@@ -16,13 +19,17 @@ export default {
       type: String,
       required: true,
     },
+    imgStyle: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   methods: {
-    pause() {
-      /* 与视频/音频统一接口，图片无需暂停 */
-    },
+    pause() {},
+    resetPlayback() {},
     onError(e) {
       if (e.target) e.target.alt = "加载失败";
+      this.$emit("image-error");
     },
   },
 };
@@ -30,8 +37,6 @@ export default {
 
 <style scoped>
 .media-pane__img {
-  max-width: 100%;
-  max-height: 100%;
   object-fit: contain;
 }
 </style>

@@ -1,8 +1,7 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "prettier.prettierPath": "./node_modules/prettier/index.cjs",
-  "prettier.configPath": ".prettierrc",
+  "prettier.prettierPath": "./node_modules/prettier",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
@@ -12,6 +11,9 @@
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "vue.format.template.enabled": false,
+  "vue.format.script.enabled": false,
+  "vue.format.style.enabled": false,
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },

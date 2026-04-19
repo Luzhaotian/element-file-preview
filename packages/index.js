@@ -23,6 +23,15 @@ export default {
   install,
 };
 
+export {
+  previewItemsFromFiles,
+  revokePreviewObjectUrls,
+  inferTypeFromFileName,
+  normalizePreviewItems,
+  inferTypeFromUrl,
+  mediaKindFromType,
+} from "./utils/resolve-items";
+
 export { FilePreview, FilePreviewThumb };
 
 /** @deprecated 请改用 FilePreview */

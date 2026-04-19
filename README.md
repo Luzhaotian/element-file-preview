@@ -112,8 +112,28 @@ export default {
 | `type`         | 否   | MIME 或扩展语义（如 `image/png`、`video/mp4`）；缺省时从 URL 推断                       |
 | `poster`       | 否   | 视频封面 / 预览图 URL                                                                   |
 | `resetOnClose` | 否   | 仅 **视频 / 音频**；默认 `true`：关闭全屏时暂停并 `currentTime = 0`；`false` 时保留进度 |
+| `name`         | 否   | 文件名；`blob:` 等无扩展路径的 URL 可凭此推断类型                                       |
+| `__isObjectUrl`| 否   | 为 `true` 时，`FilePreview` 销毁会对该项 `URL.revokeObjectURL`（见 `previewItemsFromFiles`） |
 
 解析后条目含 `mediaKind`（`image` | `video` | `audio`）等，供内部与 `FilePreviewThumb` 使用。
+
+### 本地文件 / Blob（文件流预览）
+
+使用 **`previewItemsFromFiles(files)`**（`files` 为 `File` / `Blob`、`File[]`、`FileList` 或 `Blob[]`）生成可合并进 `urls` 的条目：`url` 为 `URL.createObjectURL` 结果，并设置 **`type`**（优先 `file.type`，否则按扩展名推断）、**`name`**、**`__isObjectUrl: true`**。适用于本地上传、`<input type="file">`、`el-upload` 的 `raw` 等。
+
+不再需要这些对象 URL 时，可调用 **`revokePreviewObjectUrls(items)`** 释放内存。`FilePreview` 会在 **`urls` 中去掉某条带 `__isObjectUrl` 的项时自动 revoke** 对应 blob，并在组件销毁时 revoke 仍留在列表中的此类项。
+
+```javascript
+import {
+  FilePreview,
+  previewItemsFromFiles,
+  revokePreviewObjectUrls,
+} from "element-file-preview";
+
+// 例如 el-upload 的 on-change：file.raw 为 File
+const items = previewItemsFromFiles([file.raw]);
+this.urls = this.urls.concat(items);
+```
 
 ## 全屏预览行为
 

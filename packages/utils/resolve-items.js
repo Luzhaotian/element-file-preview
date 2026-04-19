@@ -38,6 +38,25 @@ const KNOWN_OTHER_EXT = {
 };
 
 /**
+ * 从文件名（可含路径）推断 MIME；无法识别返回 "unknown"
+ * @param {string} name
+ * @returns {string}
+ */
+export function inferTypeFromFileName(name) {
+  if (name == null || typeof name !== "string") return "unknown";
+  const base = name.replace(/\\/g, "/").split("/").pop() || "";
+  const dot = base.lastIndexOf(".");
+  if (dot === -1 || dot === base.length - 1) return "unknown";
+  const ext = base.slice(dot + 1).toLowerCase();
+  if (!ext) return "unknown";
+  if (IMAGE_EXT_TO_MIME[ext]) return IMAGE_EXT_TO_MIME[ext];
+  if (VIDEO_EXT_TO_MIME[ext]) return VIDEO_EXT_TO_MIME[ext];
+  if (AUDIO_EXT_TO_MIME[ext]) return AUDIO_EXT_TO_MIME[ext];
+  if (KNOWN_OTHER_EXT[ext]) return KNOWN_OTHER_EXT[ext];
+  return "unknown";
+}
+
+/**
  * 从 URL 推断 MIME 或简短类型；无法识别返回 "unknown"
  * @param {string} url
  * @returns {string}
@@ -62,16 +81,7 @@ export function inferTypeFromUrl(url) {
   }
 
   const base = pathname.split("/").pop() || "";
-  const dot = base.lastIndexOf(".");
-  if (dot === -1 || dot === base.length - 1) return "unknown";
-  const ext = base.slice(dot + 1).toLowerCase();
-  if (!ext) return "unknown";
-
-  if (IMAGE_EXT_TO_MIME[ext]) return IMAGE_EXT_TO_MIME[ext];
-  if (VIDEO_EXT_TO_MIME[ext]) return VIDEO_EXT_TO_MIME[ext];
-  if (AUDIO_EXT_TO_MIME[ext]) return AUDIO_EXT_TO_MIME[ext];
-  if (KNOWN_OTHER_EXT[ext]) return KNOWN_OTHER_EXT[ext];
-  return "unknown";
+  return inferTypeFromFileName(base);
 }
 
 /**
@@ -97,7 +107,62 @@ export function mediaKindFromType(type) {
 }
 
 /**
- * @param {Array<{ url: string, type?: string, poster?: string, resetOnClose?: boolean }>} items
+ * 将本地 File / Blob 文件转为可交给 FilePreview 的条目（`URL.createObjectURL`，适用于文件流 / 本地上传预览）。
+ * 返回项带 `__isObjectUrl: true`，便于在卸载时调用 `revokePreviewObjectUrls` 释放内存。
+ * @param {File|Blob|File[]|FileList|Blob[]} files
+ * @param {{ resetOnClose?: boolean }} [options]
+ * @returns {Array<{ url: string, type: string, name: string, resetOnClose: boolean, __isObjectUrl: boolean }>}
+ */
+export function previewItemsFromFiles(files, options = {}) {
+  const resetOnClose = options.resetOnClose !== false;
+  let list;
+  if (files instanceof File || files instanceof Blob) {
+    list = [files];
+  } else {
+    list = Array.from(files || []).filter((f) => f instanceof Blob);
+  }
+  return list.map((blob) => {
+    const name = blob instanceof File ? blob.name : "";
+    let type = (blob.type || "").trim();
+    if (
+      !type ||
+      type === "application/octet-stream" ||
+      type === "application/x-msdownload"
+    ) {
+      const fromName = inferTypeFromFileName(name);
+      if (fromName !== "unknown") type = fromName;
+    }
+    if (!type) type = "application/octet-stream";
+    const url = URL.createObjectURL(blob);
+    return {
+      url,
+      type,
+      name,
+      resetOnClose,
+      __isObjectUrl: true,
+    };
+  });
+}
+
+/**
+ * 释放 `previewItemsFromFiles` 或任意 `blob:` 对象 URL（传入的数组可为 FilePreview 的 `urls` 子集）。
+ * @param {Array<{ url?: string, __isObjectUrl?: boolean }|null|undefined>} items
+ */
+export function revokePreviewObjectUrls(items) {
+  if (!Array.isArray(items)) return;
+  items.forEach((item) => {
+    if (!item || typeof item.url !== "string") return;
+    if (!item.url.startsWith("blob:")) return;
+    try {
+      URL.revokeObjectURL(item.url);
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+/**
+ * @param {Array<{ url: string, type?: string, name?: string, poster?: string, resetOnClose?: boolean, __isObjectUrl?: boolean }>} items
  * @returns {Array<{ url: string, type: string, mediaKind: 'image'|'video'|'audio'|null, poster: string, resetOnClose: boolean, supported: boolean, typeSource: 'explicit' | 'inferred' }>}
  */
 export function normalizePreviewItems(items) {
@@ -112,6 +177,17 @@ export function normalizePreviewItems(items) {
     const resetOnClose = !(raw && raw.resetOnClose === false);
     let type = raw && raw.type != null ? String(raw.type).trim() : "";
     let typeSource = "explicit";
+
+    if (!type) {
+      const name = raw && raw.name != null ? String(raw.name).trim() : "";
+      if (name) {
+        const inferred = inferTypeFromFileName(name);
+        if (inferred !== "unknown") {
+          type = inferred;
+          typeSource = "inferred";
+        }
+      }
+    }
 
     if (!type) {
       type = inferTypeFromUrl(url);

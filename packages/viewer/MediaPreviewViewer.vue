@@ -269,6 +269,7 @@ export default {
     this._keyDownHandler = null;
     off(document, mousewheelEventName, this._mouseWheelHandler);
     this._mouseWheelHandler = null;
+    this.teardownImageDrag();
     if (
       this.appendToBody &&
       this.$el &&
@@ -279,6 +280,16 @@ export default {
     }
   },
   methods: {
+    teardownImageDrag() {
+      if (this._dragHandler) {
+        off(document, "mousemove", this._dragHandler);
+        this._dragHandler = null;
+      }
+      if (this._mouseupHandler) {
+        off(document, "mouseup", this._mouseupHandler);
+        this._mouseupHandler = null;
+      }
+    },
     hide() {
       this.applyResetBeforeClose();
       this.pauseMedia();
@@ -365,6 +376,7 @@ export default {
     },
     onImageMouseDown(e) {
       if (this.imageLoading || e.button !== 0) return;
+      this.teardownImageDrag();
       const { offsetX, offsetY } = this.imageTransform;
       const startX = e.pageX;
       const startY = e.pageY;
@@ -372,10 +384,11 @@ export default {
         this.imageTransform.offsetX = offsetX + ev.pageX - startX;
         this.imageTransform.offsetY = offsetY + ev.pageY - startY;
       });
+      this._mouseupHandler = () => {
+        this.teardownImageDrag();
+      };
       on(document, "mousemove", this._dragHandler);
-      on(document, "mouseup", () => {
-        off(document, "mousemove", this._dragHandler);
-      });
+      on(document, "mouseup", this._mouseupHandler);
       e.preventDefault();
     },
   },

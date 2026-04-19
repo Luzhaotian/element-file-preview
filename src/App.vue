@@ -3,22 +3,57 @@
     <header class="header">
       <h1 class="title">文件预览</h1>
       <p class="subtitle">
-        图片 / 视频 / 音频统一预览：缩略区使用
-        <code>el-image</code> 或原生媒体；全屏层沿用
-        <code>el-image-viewer</code> 同款遮罩与操作区样式。
+        图片 / 视频 / 音频统一预览；全屏层与
+        <code>el-image-viewer</code>
+        样式一致。下方可上传本地文件，使用对象 URL 模拟文件流预览。
       </p>
     </header>
 
-    <section class="gallery-wrap" aria-label="示例媒体">
-      <file-preview :urls="fileItems" />
+    <section class="toolbar" aria-label="本地上传测试">
+      <!-- 原生 file input：避免 el-upload + action="#" 在部分环境下点击/选文件无响应 -->
+      <span class="upload-inline">
+        <el-button
+          size="small"
+          type="primary"
+          native-type="button"
+          @click="openLocalPicker"
+        >
+          选择本地文件（流 / Blob 预览）
+        </el-button>
+        <input
+          ref="localFileInput"
+          class="local-file-input"
+          type="file"
+          multiple
+          accept="image/*,video/*,audio/*,.mp3,.mp4,.webm,.wav,.ogg,.m4a"
+          @change="onNativeFileChange"
+        />
+      </span>
+      <el-button
+        v-if="blobItems.length"
+        size="small"
+        @click="clearLocalBlobs"
+      >
+        清空本地上传
+      </el-button>
     </section>
 
-    <p class="hint">点击任意缩略图即可打开预览，支持左右切换与关闭。</p>
+    <section class="gallery-wrap" aria-label="示例媒体">
+      <file-preview :urls="previewUrls" />
+    </section>
+
+    <p class="hint">
+      点击缩略图打开预览；左右键可在「网络资源 + 本地上传」整列表中切换。
+    </p>
   </div>
 </template>
 
 <script>
-import { FilePreview } from "../packages";
+import FilePreview from "../packages/components/FilePreview.vue";
+import {
+  previewItemsFromFiles,
+  revokePreviewObjectUrls,
+} from "../packages/utils/resolve-items";
 
 const SAMPLE_FILES = [
   {
@@ -49,8 +84,33 @@ export default {
   },
   data() {
     return {
-      fileItems: SAMPLE_FILES,
+      blobItems: [],
     };
+  },
+  computed: {
+    previewUrls() {
+      return SAMPLE_FILES.concat(this.blobItems);
+    },
+  },
+  beforeDestroy() {
+    revokePreviewObjectUrls(this.blobItems);
+  },
+  methods: {
+    openLocalPicker() {
+      const input = this.$refs.localFileInput;
+      if (input) input.click();
+    },
+    onNativeFileChange(ev) {
+      const input = ev.target;
+      if (!input || !input.files || !input.files.length) return;
+      const items = previewItemsFromFiles(Array.from(input.files));
+      this.blobItems = this.blobItems.concat(items);
+      input.value = "";
+    },
+    clearLocalBlobs() {
+      revokePreviewObjectUrls(this.blobItems);
+      this.blobItems = [];
+    },
   },
 };
 </script>
@@ -99,6 +159,35 @@ body,
   background: #ecf5ff;
   color: #409eff;
   border-radius: 4px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto 20px;
+}
+
+.upload-inline {
+  position: relative;
+  display: inline-block;
+}
+
+.local-file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .gallery-wrap {

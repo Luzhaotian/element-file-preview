@@ -52,6 +52,21 @@ export default {
 };
 ```
 
+### 工具函数（具名导出）
+
+除组件外，入口还导出与类型 / 条目相关的工具（定义见 `packages/utils/resolve-items.js`）：
+
+- **`previewItemsFromFiles`**、**`revokePreviewObjectUrls`**：本地 `File` / `Blob` 与对象 URL 生命周期（见下文「本地文件 / Blob」）。
+- **`normalizePreviewItems`**、**`inferTypeFromUrl`**、**`inferTypeFromFileName`**、**`mediaKindFromType`**：可在写入 `urls` 前自行归一化或推断类型。
+
+```javascript
+import {
+  FilePreview,
+  previewItemsFromFiles,
+  normalizePreviewItems,
+} from "element-file-preview";
+```
+
 ### 最小示例
 
 ```vue
@@ -106,14 +121,14 @@ export default {
 
 对象字段：
 
-| 字段           | 必填 | 说明                                                                                    |
-| -------------- | ---- | --------------------------------------------------------------------------------------- |
-| `url`          | 是   | 资源地址                                                                                |
-| `type`         | 否   | MIME 或扩展语义（如 `image/png`、`video/mp4`）；缺省时从 URL 推断                       |
-| `poster`       | 否   | 视频封面 / 预览图 URL                                                                   |
-| `resetOnClose` | 否   | 仅 **视频 / 音频**；默认 `true`：关闭全屏时暂停并 `currentTime = 0`；`false` 时保留进度 |
-| `name`         | 否   | 文件名；`blob:` 等无扩展路径的 URL 可凭此推断类型                                       |
-| `__isObjectUrl`| 否   | 为 `true` 时，`FilePreview` 销毁会对该项 `URL.revokeObjectURL`（见 `previewItemsFromFiles`） |
+| 字段            | 必填 | 说明                                                                                         |
+| --------------- | ---- | -------------------------------------------------------------------------------------------- |
+| `url`           | 是   | 资源地址                                                                                     |
+| `type`          | 否   | MIME 或扩展语义（如 `image/png`、`video/mp4`）；缺省时从 URL 推断                            |
+| `poster`        | 否   | 视频封面 / 预览图 URL                                                                        |
+| `resetOnClose`  | 否   | 仅 **视频 / 音频**；默认 `true`：关闭全屏时暂停并 `currentTime = 0`；`false` 时保留进度      |
+| `name`          | 否   | 文件名；`blob:` 等无扩展路径的 URL 可凭此推断类型                                            |
+| `__isObjectUrl` | 否   | 为 `true` 时，`FilePreview` 销毁会对该项 `URL.revokeObjectURL`（见 `previewItemsFromFiles`） |
 
 解析后条目含 `mediaKind`（`image` | `video` | `audio`）等，供内部与 `FilePreviewThumb` 使用。
 
@@ -178,6 +193,8 @@ npm install
 npm run lib      # 输出 dist/
 npm run serve    # 演示应用
 ```
+
+演示页（`src/App.vue`）在固定网络示例之外，通过 **原生 `<input type="file" multiple>`**（由 `el-button` 触发 `click()`）选择本地文件，使用 **`previewItemsFromFiles`** 生成对象 URL 并拼入 `urls`，用于验证 Blob / 文件流预览与 **`revokePreviewObjectUrls`** 清理；避免依赖 `el-upload` + `action="#"` 在部分环境下的兼容问题。
 
 ## 链接
 

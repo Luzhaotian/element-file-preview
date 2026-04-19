@@ -1,6 +1,6 @@
 {
   "name": "element-file-preview",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "description": "文件预览 — Vue 2 + Element UI：图片 / 视频 / 音频缩略与全屏预览（el-image-viewer 样式遮罩）",
   "main": "dist/element-file-preview.umd.js",

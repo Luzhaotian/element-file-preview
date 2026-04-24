@@ -74,6 +74,25 @@
             ref="activePane"
             :url="currentItem.url"
           />
+          <viewer-excel-pane
+            v-else-if="currentItem.mediaKind === 'excel'"
+            :key="'e-' + currentItem.url"
+            ref="activePane"
+            :url="currentItem.url"
+          />
+          <viewer-pdf-pane
+            v-else-if="currentItem.mediaKind === 'pdf'"
+            :key="'p-' + currentItem.url"
+            ref="activePane"
+            :url="currentItem.url"
+          />
+          <viewer-word-pane
+            v-else-if="currentItem.mediaKind === 'word'"
+            :key="'w-' + currentItem.url"
+            ref="activePane"
+            :url="currentItem.url"
+            :type="currentItem.type"
+          />
         </template>
       </div>
     </div>
@@ -84,8 +103,11 @@
 import { on, off } from "element-ui/src/utils/dom";
 import { rafThrottle, isFirefox } from "element-ui/src/utils/util";
 import ViewerAudioPane from "../type-handlers/panes/audio-pane.vue";
+import ViewerExcelPane from "../type-handlers/panes/excel-pane.vue";
 import ViewerImagePane from "../type-handlers/panes/image-pane.vue";
+import ViewerPdfPane from "../type-handlers/panes/pdf-pane.vue";
 import ViewerVideoPane from "../type-handlers/panes/video-pane.vue";
+import ViewerWordPane from "../type-handlers/panes/word-pane.vue";
 
 const mousewheelEventName = isFirefox() ? "DOMMouseScroll" : "mousewheel";
 
@@ -106,6 +128,9 @@ export default {
     ViewerImagePane,
     ViewerVideoPane,
     ViewerAudioPane,
+    ViewerExcelPane,
+    ViewerPdfPane,
+    ViewerWordPane,
   },
   props: {
     /** @type {{ url: string, mediaKind: string, poster?: string, resetOnClose?: boolean }[]} */

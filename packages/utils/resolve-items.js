@@ -30,11 +30,21 @@ const AUDIO_EXT_TO_MIME = {
   opus: "audio/opus",
 };
 
-/** 当前组件不预览的已知类型（需业务侧自行处理） */
-const KNOWN_OTHER_EXT = {
-  pdf: "application/pdf",
+const EXCEL_EXT_TO_MIME = {
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  xlsm: "application/vnd.ms-excel.sheet.macroEnabled.12",
+  csv: "text/csv",
+};
+
+const WORD_EXT_TO_MIME = {
   doc: "application/msword",
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+};
+
+/** 常见其他类型映射（如 pdf） */
+const KNOWN_OTHER_EXT = {
+  pdf: "application/pdf",
 };
 
 /**
@@ -52,6 +62,8 @@ export function inferTypeFromFileName(name) {
   if (IMAGE_EXT_TO_MIME[ext]) return IMAGE_EXT_TO_MIME[ext];
   if (VIDEO_EXT_TO_MIME[ext]) return VIDEO_EXT_TO_MIME[ext];
   if (AUDIO_EXT_TO_MIME[ext]) return AUDIO_EXT_TO_MIME[ext];
+  if (EXCEL_EXT_TO_MIME[ext]) return EXCEL_EXT_TO_MIME[ext];
+  if (WORD_EXT_TO_MIME[ext]) return WORD_EXT_TO_MIME[ext];
   if (KNOWN_OTHER_EXT[ext]) return KNOWN_OTHER_EXT[ext];
   return "unknown";
 }
@@ -86,7 +98,7 @@ export function inferTypeFromUrl(url) {
 
 /**
  * @param {string} type
- * @returns {'image' | 'video' | 'audio' | null}
+ * @returns {'image' | 'video' | 'audio' | 'pdf' | 'excel' | 'word' | null}
  */
 export function mediaKindFromType(type) {
   if (type == null || type === "" || type === "unknown") return null;
@@ -95,6 +107,23 @@ export function mediaKindFromType(type) {
   if (t === "image" || t.startsWith("image/")) return "image";
   if (t === "video" || t.startsWith("video/")) return "video";
   if (t === "audio" || t.startsWith("audio/")) return "audio";
+  if (t === "pdf" || t === "application/pdf") return "pdf";
+  if (
+    t === "excel" ||
+    t === "text/csv" ||
+    t === "application/vnd.ms-excel" ||
+    t === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    t === "application/vnd.ms-excel.sheet.macroenabled.12"
+  ) {
+    return "excel";
+  }
+  if (
+    t === "word" ||
+    t === "application/msword" ||
+    t === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    return "word";
+  }
 
   if (Object.prototype.hasOwnProperty.call(IMAGE_EXT_TO_MIME, t))
     return "image";
@@ -102,6 +131,9 @@ export function mediaKindFromType(type) {
     return "video";
   if (Object.prototype.hasOwnProperty.call(AUDIO_EXT_TO_MIME, t))
     return "audio";
+  if (Object.prototype.hasOwnProperty.call(EXCEL_EXT_TO_MIME, t))
+    return "excel";
+  if (Object.prototype.hasOwnProperty.call(WORD_EXT_TO_MIME, t)) return "word";
 
   return null;
 }
@@ -163,7 +195,7 @@ export function revokePreviewObjectUrls(items) {
 
 /**
  * @param {Array<{ url: string, type?: string, name?: string, poster?: string, resetOnClose?: boolean, __isObjectUrl?: boolean }>} items
- * @returns {Array<{ url: string, type: string, mediaKind: 'image'|'video'|'audio'|null, poster: string, resetOnClose: boolean, supported: boolean, typeSource: 'explicit' | 'inferred' }>}
+ * @returns {Array<{ url: string, type: string, mediaKind: 'image'|'video'|'audio'|'pdf'|'excel'|'word'|null, poster: string, resetOnClose: boolean, supported: boolean, typeSource: 'explicit' | 'inferred' }>}
  */
 export function normalizePreviewItems(items) {
   if (!Array.isArray(items)) return [];

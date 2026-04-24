@@ -19,13 +19,19 @@
       :poster="item.poster"
     />
     <audio-preview-thumb v-else-if="isAudio" />
+    <excel-preview-thumb v-else-if="isExcel" />
+    <pdf-preview-thumb v-else-if="isPdf" :url="item.url" />
+    <word-preview-thumb v-else-if="isWord" />
     <div v-else class="file-preview-thumb__placeholder" aria-hidden="true" />
   </div>
 </template>
 
 <script>
 import AudioPreviewThumb from "../type-handlers/thumbs/audio-thumb.vue";
+import ExcelPreviewThumb from "../type-handlers/thumbs/excel-thumb.vue";
+import PdfPreviewThumb from "../type-handlers/thumbs/pdf-thumb.vue";
 import VideoPreviewThumb from "../type-handlers/thumbs/video-thumb.vue";
+import WordPreviewThumb from "../type-handlers/thumbs/word-thumb.vue";
 
 /**
  * 单格缩略：根据 `item.mediaKind` 渲染图片 / 视频 / 音频（与 FilePreview 解析后的条目一致）。
@@ -36,6 +42,9 @@ export default {
   components: {
     VideoPreviewThumb,
     AudioPreviewThumb,
+    ExcelPreviewThumb,
+    PdfPreviewThumb,
+    WordPreviewThumb,
   },
   props: {
     /** 归一化后的项：{ url, mediaKind, poster?, … } */
@@ -61,6 +70,15 @@ export default {
     isAudio() {
       return this.item.mediaKind === "audio";
     },
+    isExcel() {
+      return this.item.mediaKind === "excel";
+    },
+    isPdf() {
+      return this.item.mediaKind === "pdf";
+    },
+    isWord() {
+      return this.item.mediaKind === "word";
+    },
   },
   methods: {
     onActivate() {
@@ -83,7 +101,6 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  vertical-align: top;
 }
 
 .file-preview-thumb__placeholder {

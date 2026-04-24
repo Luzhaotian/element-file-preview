@@ -4,7 +4,22 @@
 
 ## [未发布]
 
-（暂无）
+### 新增
+
+- 支持 **PDF 预览**：接入 `pdfjs-dist`，可将 PDF 渲染为页图；支持在缩略图区展示封面或全部页（`pdfThumbCoverOnly`）。
+- 支持 **Excel 预览**：接入 `xlsx`，支持 `xls/xlsx/xlsm/csv`，全屏以表格渲染并支持多 Sheet 切换。
+- 支持 **Word 预览**：接入 `mammoth`，支持 `docx` 转 HTML 预览；`doc` 文件给出兼容提示。
+- `FilePreview` 新增属性 **`pdfThumbCoverOnly`**（默认 `true`），可由业务侧控制 PDF 缩略图模式（封面 / 全页）。
+
+### 修复
+
+- 修复“上传文件后列表偶发不显示”问题：`resolveUrls` 改为两阶段更新（先渲染基础列表，再异步补齐 PDF 拆页），避免被慢速 PDF 解析阻塞。
+- 修复 PDF worker 初始化报错：为 `pdfjs-dist@5` 显式设置 `GlobalWorkerOptions.workerSrc`。
+- 修复 PDF 预览回归：在“缩略图仅封面”模式下，点击封面仍可进入整份 PDF 的全页序列预览。
+
+### 文档
+
+- README 新增 PDF / Excel / Word 能力说明、`pdfThumbCoverOnly` 参数说明与演示更新。
 
 ## [0.2.0] - 2026-04-19
 

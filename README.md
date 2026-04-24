@@ -1,11 +1,11 @@
 # element-file-preview
 
-基于 **Vue 2** 与 **Element UI** 的文件预览小库：缩略图网格 + 全屏层，样式与 `el-image-viewer` 的遮罩与按钮一致。图片、视频、音频排在同一列表中时，**左右切换会按顺序经过全部条目**。
+基于 **Vue 2** 与 **Element UI** 的文件预览小库：缩略图网格 + 全屏层，样式与 `el-image-viewer` 的遮罩与按钮一致。图片、视频、音频、PDF、Excel、Word 排在同一列表中时，**左右切换会按顺序经过全部条目**。
 
 ## 特性
 
-- **缩略图**：`FilePreview` 内置 `FilePreviewThumb`，按类型展示图 / 视频 / 音频格。
-- **全屏**：单一 `MediaPreviewViewer` 壳层；图片带与 Element 相近的缩放、旋转、适应/原始尺寸、拖拽与滚轮；视频 / 音频为内嵌控件。
+- **缩略图**：`FilePreview` 内置 `FilePreviewThumb`，按类型展示图 / 视频 / 音频 / PDF / Excel / Word 格。
+- **全屏**：单一 `MediaPreviewViewer` 壳层；图片带与 Element 相近的缩放、旋转、适应/原始尺寸、拖拽与滚轮；视频 / 音频为内嵌控件；PDF 渲染为页面图片列表；Excel 以表格形式预览并支持 Sheet 切换；Word（`.docx`）渲染为 HTML 文档预览。
 - **数据**：传入 `urls` 后由 `normalizePreviewItems` 推断 `type` 与 `mediaKind`；不支持的项在开发环境 `console.warn` 并跳过。
 - **发布**：UMD / CommonJS 产物在 `dist/`，入口见 `package.json` 的 `main` 与 `files`。
 
@@ -15,6 +15,12 @@
 | ---------- | ------- |
 | Vue        | `^2.6`  |
 | Element UI | `^2.15` |
+
+内置预览依赖（已在包内声明）：
+
+- `pdfjs-dist`：PDF 拆页渲染
+- `xlsx`：Excel 解析
+- `mammoth`：Word（`.docx`）转 HTML
 
 业务项目需引入 **`element-ui/lib/theme-chalk/index.css`**（含 `image` / `image-viewer` 相关样式），否则全屏层按钮与工具条可能无样式。
 
@@ -116,6 +122,7 @@ export default {
 | `gap`          | `Number`  | `16`     | 缩略格间距（px）                                                                      |
 | `viewerZIndex` | `Number`  | `2000`   | 全屏层 z-index                                                                        |
 | `maskClosable` | `Boolean` | `true`   | 点击遮罩是否关闭全屏（建议写 `:mask-closable="false"`，勿写无绑定的字符串 `"false"`） |
+| `pdfThumbCoverOnly` | `Boolean` | `true` | PDF 在缩略图区是否仅显示封面页；`false` 时按页显示全部缩略图 |
 
 ## `urls` 每一项
 
@@ -130,7 +137,13 @@ export default {
 | `name`          | 否   | 文件名；`blob:` 等无扩展路径的 URL 可凭此推断类型                                            |
 | `__isObjectUrl` | 否   | 为 `true` 时，`FilePreview` 销毁会对该项 `URL.revokeObjectURL`（见 `previewItemsFromFiles`） |
 
-解析后条目含 `mediaKind`（`image` | `video` | `audio`）等，供内部与 `FilePreviewThumb` 使用。
+解析后条目含 `mediaKind`（`image` | `video` | `audio` | `pdf` | `excel` | `word`）等，供内部与 `FilePreviewThumb` 使用。
+
+类型说明：
+
+- **PDF**：支持 URL / Blob，渲染为页图预览。
+- **Excel**：支持 `xls/xlsx/xlsm/csv`，全屏渲染为表格并支持 Sheet 切换。
+- **Word**：推荐 `docx`；`doc` 受格式限制，当前不直接渲染。
 
 ### 本地文件 / Blob（文件流预览）
 
@@ -153,7 +166,7 @@ this.urls = this.urls.concat(items);
 ## 全屏预览行为
 
 - 使用 **`MediaPreviewViewer`**（本包内部组件，默认不从 `index` 导出）。
-- **顺序**：与过滤后的 `mediaEntries` 顺序一致，上一张 / 下一张在**全部**图片与音视频之间循环（多于一条时显示左右箭头）。
+- **顺序**：与 `viewerEntries` 顺序一致，上一张 / 下一张在全部可预览条目之间循环（多于一条时显示左右箭头）。
 - **图片**：底部工具条与快捷键行为对齐 Element `image-viewer` 习惯（含空格切换显示模式、方向键缩放等）。
 - **键盘**：`Esc` 关闭；`←` `→` 切换条目（在图片模式下与 Element 一致）。
 
@@ -178,12 +191,15 @@ packages/
 │   ├── FilePreview.vue
 │   └── FilePreviewThumb.vue
 ├── viewer/
-│   └── MediaPreviewViewer.vue       # 全屏壳 + 图片工具条 + 音视频画布
+│   └── MediaPreviewViewer.vue       # 全屏壳 + 图片工具条 + 多类型 pane
 ├── type-handlers/
-│   ├── thumbs/                      # 视频 / 音频缩略
-│   └── panes/                       # 全屏内 图 / 视频 / 音频
+│   ├── thumbs/                      # 视频 / 音频 / PDF / Excel / Word 缩略
+│   └── panes/                       # 全屏内图 / 视频 / 音频 / PDF / Excel / Word
 └── utils/
-    └── resolve-items.js             # 类型推断与归一化
+    ├── resolve-items.js             # 类型推断与归一化
+    ├── pdf-render.js                # PDF 渲染
+    ├── excel-render.js              # Excel 解析
+    └── word-render.js               # Word 渲染
 ```
 
 ## 构建与本地演示

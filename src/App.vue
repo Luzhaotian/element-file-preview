@@ -3,7 +3,7 @@
     <header class="header">
       <h1 class="title">文件预览</h1>
       <p class="subtitle">
-        图片 / 视频 / 音频统一预览；全屏层与
+        图片 / 视频 / 音频 / PDF / Excel / Word 统一预览；全屏层与
         <code>el-image-viewer</code>
         样式一致。下方可上传本地文件，使用对象 URL 模拟文件流预览。
       </p>
@@ -25,7 +25,7 @@
           class="local-file-input"
           type="file"
           multiple
-          accept="image/*,video/*,audio/*,.mp3,.mp4,.webm,.wav,.ogg,.m4a"
+          accept="image/*,video/*,audio/*,application/pdf,.pdf,.xls,.xlsx,.csv,.doc,.docx,.mp3,.mp4,.webm,.wav,.ogg,.m4a"
           @change="onNativeFileChange"
         />
       </span>
@@ -74,6 +74,18 @@ const SAMPLE_FILES = [
   {
     url: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3",
     type: "audio/mpeg",
+  },
+  {
+    url: "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf",
+    type: "application/pdf",
+  },
+  {
+    url: "data:text/csv;charset=utf-8,Name,Score%0AAlice,92%0ABob,85%0ACharlie,97",
+    type: "text/csv",
+  },
+  {
+    url: "https://raw.githubusercontent.com/mwilliamson/mammoth.js/master/test/test-data/simple-list.docx",
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   },
 ];
 

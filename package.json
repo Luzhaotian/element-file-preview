@@ -38,6 +38,7 @@
     "format": "prettier --write \"**/*.{js,vue,json,css,md,html}\" --ignore-path .prettierignore",
     "format:check": "prettier --check \"**/*.{js,vue,json,css,md,html}\" --ignore-path .prettierignore",
     "lib": "vue-cli-service build --target lib --name element-file-preview packages/index.js",
+    "publish:npm": "npm publish --registry=https://registry.npmjs.org/ --access public",
     "prepare": "husky"
   },
   "lint-staged": {
